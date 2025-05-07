@@ -365,5 +365,7 @@ jobs:
 
   build_iso:
     name: Build ISO
+    needs: [generate_release]
     if: github.event.inputs.ISO-select == 'true'
+    secrets: inherit
     uses: ./.github/workflows/build_iso_test.yml
