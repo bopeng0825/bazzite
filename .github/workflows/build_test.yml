@@ -8,6 +8,10 @@ on:
         description: 'Clear rechunk history'
         type: boolean
         default: false
+      ISO-select:
+        description: 'iso ?'
+        type: boolean
+        default: false
 
 env:
   PULL_IMAGE_REGISTRY: ghcr.io/ublue-os
@@ -358,3 +362,8 @@ jobs:
     if: github.event_name != 'pull_request'
     secrets: inherit
     uses: ./.github/workflows/generate_release.yml
+
+  build_iso:
+    name: Build ISO
+    if: github.event.inputs.ISO-select == 'true'
+    uses: ./.github/workflows/build_iso_test.yml
