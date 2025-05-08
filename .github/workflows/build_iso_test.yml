@@ -143,5 +143,5 @@ jobs:
           path: ${{ steps.upload-directory.outputs.iso-upload-dir }}
           if-no-files-found: error
           retention-days: 5
-          compression-level: 6
+          compression-level: 0
           overwrite: true
