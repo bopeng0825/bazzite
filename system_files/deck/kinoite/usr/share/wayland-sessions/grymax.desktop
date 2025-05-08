@@ -1,6 +1,5 @@
 [Desktop Entry]
-Exec=gamescope --expose-wanyland /usr/bin/start_grymax_main.sh
-TryExec=gamescope --expose-wanyland /usr/bin/start_grymax_main.sh
+Exec=gamescope --expose-wayland /usr/bin/start_grymax_main.sh
 DesktopNames=KDE
 Name=Grymax
 Comment=Grymax start
