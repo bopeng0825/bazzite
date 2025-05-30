@@ -203,12 +203,21 @@ enable-automounting:
     set -eo pipefail
     rule=/etc/udev/rules.d/99-media-automount.rules
     if [[ "$(readlink $rule || :)" == /dev/null ]]; then
-        sudo rm -f $rule
+        sudo -A rm -f $rule
+    fi
+    if systemctl status --no-pager ublue-os-media-automount.service >/dev/null 2>&1; then
+        sudo -A systemctl enable --now ublue-os-media-automount.service
     fi
 
 # Disables automounting of labeled BTRFS/EXT4 partitions under /run/media/system
 disable-automounting:
-    sudo ln -sf /dev/null /etc/udev/rules.d/99-media-automount.rules
+    #!/usr/bin/bash
+    set -eo pipefail
+    rule=/etc/udev/rules.d/99-media-automount.rules
+    sudo ln -sf /dev/null $rule
+    if systemctl status --no-pager ublue-os-media-automount.service >/dev/null 2>&1; then
+        sudo -A systemctl disable ublue-os-media-automount.service
+    fi
 
 # Enable support for DisplayLink
 enable-displaylink:
@@ -283,7 +292,12 @@ setup-decky ACTION="install":
       echo "  <option>: Specify the quick option to skip the prompt"
       echo "  Use 'install' to select Install Decky"
       echo "  Use 'prerelease' to select Install Decky Prerelease"
+      echo "  Use 'uninstall' to uninstall Decky Loader"
       exit 0
+    elif [ "$OPTION" == "" ]; then
+      echo "${bold}Decky Loader setup and configuration${normal}"
+      echo "Decky is $DECKY_STATE"
+      OPTION=$(Choose "Install Decky" "Install Decky Prerelease" "Uninstall Decky" "Exit")
     fi
     if [[ "${OPTION,,}" =~ install ]]; then
       export HOME=$(getent passwd ${SUDO_USER:-$USER} | cut -d: -f6)
@@ -306,6 +320,11 @@ setup-decky ACTION="install":
       fi
       curl -L https://github.com/SteamDeckHomebrew/decky-installer/releases/latest/download/install_prerelease.sh | sh
       sudo -A chcon -R -t bin_t $HOME/homebrew/services/PluginLoader
+    fi
+    if [[ "${OPTION,,}" =~ uninstall ]]; then
+      echo "Uninstalling Decky Loader..."
+      curl -L https://github.com/SteamDeckHomebrew/decky-installer/releases/latest/download/uninstall.sh | sh
+      echo "Decky Loader has been uninstalled."
     fi
 
 # Ptyxis terminal transparency
