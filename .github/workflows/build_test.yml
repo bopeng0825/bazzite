@@ -44,7 +44,7 @@ jobs:
             is_latest_version: true
             is_stable_version: true
             kernel_flavor: bazzite
-            kernel_version: 6.14.4-104.bazzite.fc42.x86_64
+            kernel_version: 6.14.6-106.bazzite.fc42.x86_64
     steps:
       - name: Define env.CONTAINER_TARGET
         run: |
@@ -162,7 +162,7 @@ jobs:
           UPSTREAM_TAG="${{ env.SOURCE_IMAGE_VERSION }}"
           # Remove .0 suffix from upstream tag so we can add our own and
           # the wrong one does not end up in the image.
-          UPSTREAM_TAG="${UPSTREAM_TAG%.*}"
+          UPSTREAM_TAG="${UPSTREAM_TAG%\.[0-9]}" 
           FEDORA_VERSION="${{ matrix.fedora_version }}"
           SHA_SHORT="${GITHUB_SHA::7}"
 
@@ -335,8 +335,11 @@ jobs:
           command: |
             echo "${{ secrets.GITHUB_TOKEN }}" | sudo podman login ghcr.io -u ${{ github.actor }} --password-stdin
             for tag in ${{ steps.generate-tags.outputs.alias_tags }}; do
-              sudo skopeo copy ${{ steps.rechunk.outputs.ref }} docker://${{ steps.registry_case.outputs.lowercase }}/${{ env.IMAGE_NAME }}:$tag
+            dest_image="${{ steps.registry_case.outputs.lowercase }}/${{ env.IMAGE_NAME }}:$tag"
+              sudo skopeo copy ${{ steps.rechunk.outputs.ref }} docker://$dest_image &&
+                log_sum "$dest_image"
             done
+            log_sum '```'
 
       - name: Get Image Digest
         id: digest
