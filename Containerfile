@@ -232,7 +232,6 @@ RUN --mount=type=cache,dst=/var/cache \
         firefox \
         firefox-langpacks \
         htop && \
-    	dnf5 -y swap kde-partitionmanager gnome-disk-utility && \
     /ctx/cleanup
 
 # Install new packages
@@ -241,6 +240,7 @@ RUN --mount=type=cache,dst=/var/cache \
     --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     dnf5 -y install \
+        iwd \
         twitter-twemoji-fonts \
         google-noto-sans-cjk-fonts \
         lato-fonts \
@@ -303,7 +303,6 @@ RUN --mount=type=cache,dst=/var/cache \
         stress-ng \
         snapper \
         btrfs-assistant \
-        podman-compose \
         edk2-ovmf \
         qemu \
         libvirt \
@@ -398,7 +397,7 @@ RUN --mount=type=cache,dst=/var/cache \
     --mount=type=cache,dst=/var/log \
     --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
-    curl -sL "$(curl -s https://api.github.com/repos/Zeglius/yafti-go/releases/latest | jq -r '.assets[] | select(.name == "yafti-go").browser_download_url')" -o /bin/yafti-go && \
+    curl -sL "$(curl -s https://api.github.com/repos/bazzite-org/yafti-go/releases/latest | jq -r '.assets[] | select(.name == "yafti-go").browser_download_url')" -o /bin/yafti-go && \
     chmod +x /bin/yafti-go && \
     chmod +x /usr/libexec/bazzite-yafti-launcher && \
     curl -sL "$(curl -s https://api.github.com/repos/xXJSONDeruloXx/bazzite-ujust-picker/releases/latest | jq -r '.assets[] | select(.name | test("x86_64$")) | .browser_download_url')" -o /usr/bin/ujust-picker && \
@@ -423,6 +422,7 @@ RUN --mount=type=cache,dst=/var/cache \
             fcitx5-chinese-addons \
             fcitx5-hangul \
             kcm-fcitx5 \
+            gnome-disk-utility \
             ptyxis && \
         dnf5 -y swap \
         --repo=terra-extras \
@@ -438,8 +438,10 @@ RUN --mount=type=cache,dst=/var/cache \
         dnf5 -y remove \
             plasma-welcome \
             plasma-welcome-fedora \
+            plasma-discover-kns \
             plasma-browser-integration \
             kcharselect \
+            kde-partitionmanager \
             konsole && \
         sed -i '/<entry name="launchers" type="StringList">/,/<\/entry>/ s/<default>[^<]*<\/default>/<default>preferred:\/\/browser,applications:steam.desktop,applications:net.lutris.Lutris.desktop,applications:org.gnome.Ptyxis.desktop,applications:org.kde.discover.desktop,preferred:\/\/filemanager<\/default>/' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml && \
         sed -i '/<entry name="favorites" type="StringList">/,/<\/entry>/ s/<default>[^<]*<\/default>/<default>preferred:\/\/browser,steam.desktop,net.lutris.Lutris.desktop,systemsettings.desktop,org.kde.dolphin.desktop,org.kde.kate.desktop,org.gnome.Ptyxis.desktop,org.kde.discover.desktop,system-update.desktop<\/default>/' /usr/share/plasma/plasmoids/org.kde.plasma.kickoff/contents/config/main.xml && \
@@ -447,7 +449,6 @@ RUN --mount=type=cache,dst=/var/cache \
         sed -i '/^Comment/d' /usr/share/applications/org.gnome.Ptyxis.desktop && \
         sed -i 's@Exec=ptyxis@Exec=kde-ptyxis@g' /usr/share/applications/org.gnome.Ptyxis.desktop && \
         sed -i 's@Keywords=@Keywords=konsole;console;@g' /usr/share/applications/org.gnome.Ptyxis.desktop && \
-        sed -i 's/^Exec=plasma-discover/& --backends flatpak-backend/' /usr/share/applications/org.kde.discover.desktop && \
         cp /usr/share/applications/org.gnome.Ptyxis.desktop /usr/share/kglobalaccel/org.gnome.Ptyxis.desktop && \
         setcap 'cap_net_raw+ep' /usr/libexec/ksysguard/ksgrd_network_helper \
     ; else \
@@ -911,7 +912,7 @@ RUN --mount=type=cache,dst=/var/cache \
     dnf5 -y install \
         mesa-vdpau-drivers.x86_64 \
         mesa-vdpau-drivers.i686 && \
-    curl -Lo /tmp/nvidia-install.sh https://raw.githubusercontent.com/ublue-os/main/525e900bf8b3327e3738574a54089acb963a4d3e/build_files/nvidia-install.sh && \
+    curl -Lo /tmp/nvidia-install.sh https://raw.githubusercontent.com/ublue-os/main/refs/heads/main/build_files/nvidia-install.sh && \
     chmod +x /tmp/nvidia-install.sh && \
     IMAGE_NAME="${BASE_IMAGE_NAME}" /tmp/nvidia-install.sh && \
     rm -f /usr/share/vulkan/icd.d/nouveau_icd.*.json && \
